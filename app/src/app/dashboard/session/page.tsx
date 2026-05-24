@@ -100,21 +100,24 @@ export default function SessionPage() {
           <span style={{ fontSize: "11px", color: "rgba(200,212,200,0.4)" }}>
             {job.company_name} · {job.role}
           </span>
-          <button
-            onClick={() => router.push("/dashboard")}
-            style={{
-              fontSize: "11px",
-              color: "rgba(200,212,200,0.3)",
-              background: "transparent",
-              border: "1px solid rgba(200,212,200,0.1)",
-              padding: "4px 10px",
-              borderRadius: "2px",
-              cursor: "pointer",
-              fontFamily: "monospace",
-            }}
-          >
-            terminar
-          </button>
+        <button
+        onClick={() => {
+            sessionStorage.setItem("session_messages", JSON.stringify(messages));
+            router.push("/dashboard/session/report");
+        }}
+        style={{
+            fontSize: "11px",
+            color: "rgba(200,212,200,0.3)",
+            background: "transparent",
+            border: "1px solid rgba(200,212,200,0.1)",
+            padding: "4px 10px",
+            borderRadius: "2px",
+            cursor: "pointer",
+            fontFamily: "monospace",
+        }}
+        >
+        terminar
+        </button>
         </div>
       </nav>
 
