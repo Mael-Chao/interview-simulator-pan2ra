@@ -8,6 +8,21 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/auth/login");
 
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select(`
+      id,
+      role,
+      level,
+      status,
+      started_at,
+      job_postings (company_name),
+      reports (score)
+    `)
+    .eq("user_id", user.id)
+    .order("started_at", { ascending: false })
+    .limit(10);
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -15,7 +30,6 @@ export default async function DashboardPage() {
       color: "#c8d4c8",
       fontFamily: "monospace",
     }}>
-      {/* Navbar */}
       <nav style={{
         borderBottom: "1px solid rgba(0,255,136,0.1)",
         padding: "14px 32px",
@@ -43,40 +57,80 @@ export default async function DashboardPage() {
         </div>
       </nav>
 
-      {/* Main */}
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px" }}>
-        <div style={{ marginBottom: "40px" }}>
-          <div style={{ fontSize: "11px", color: "#00ff88", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
-            $ new-session --type=technical
+        <div style={{ marginBottom: "40px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: "11px", color: "#00ff88", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
+              $ dashboard --user
+            </div>
+            <h1 style={{ fontSize: "22px", fontWeight: 700, color: "#e8f0e8", marginBottom: "4px" }}>
+              Mis entrevistas
+            </h1>
+            <p style={{ fontSize: "13px", color: "rgba(200,212,200,0.4)" }}>
+              {sessions?.length || 0} sesiones completadas
+            </p>
           </div>
-          <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#e8f0e8", marginBottom: "8px" }}>
-            Nueva entrevista
-          </h1>
-          <p style={{ fontSize: "13px", color: "rgba(200,212,200,0.4)", lineHeight: 1.6 }}>
-            Pega la descripcion del puesto y generamos una entrevista personalizada.
-          </p>
+          <Link href="/dashboard/new" style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "11px 22px",
+            background: "#00ff88",
+            color: "#080c0a",
+            fontSize: "13px",
+            fontWeight: 600,
+            borderRadius: "3px",
+            textDecoration: "none",
+          }}>
+            Nueva entrevista →
+          </Link>
         </div>
 
-        <Link href="/dashboard/new" style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "12px 24px",
-          background: "#00ff88",
-          color: "#080c0a",
-          fontSize: "13px",
-          fontWeight: 600,
-          borderRadius: "3px",
-          textDecoration: "none",
-        }}>
-          Comenzar entrevista →
-        </Link>
+        {/* Sessions list */}
+        {sessions && sessions.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {sessions.map((session: any) => {
+              const score = session.reports?.[0]?.score;
+              const scoreColor = score >= 80 ? "#00ff88" : score >= 60 ? "#ffcc00" : "#ff6b6b";
+              const date = new Date(session.started_at).toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              });
 
-        {/* Sessions placeholder */}
-        <div style={{ marginTop: "60px" }}>
-          <div style={{ fontSize: "11px", color: "rgba(200,212,200,0.3)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px" }}>
-            Sesiones anteriores
+              return (
+                <div key={session.id} style={{
+                  padding: "16px 20px",
+                  border: "1px solid rgba(0,255,136,0.1)",
+                  borderRadius: "4px",
+                  background: "rgba(0,255,136,0.02)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <span style={{ fontSize: "14px", color: "#e8f0e8", fontWeight: 600 }}>
+                      {session.job_postings?.company_name || "Empresa"}
+                    </span>
+                    <span style={{ fontSize: "12px", color: "rgba(200,212,200,0.4)" }}>
+                      {session.role} · {session.level} · {date}
+                    </span>
+                  </div>
+                  {score !== undefined && (
+                    <div style={{
+                      fontSize: "22px",
+                      fontWeight: 800,
+                      color: scoreColor,
+                      fontFamily: "system-ui, sans-serif",
+                    }}>
+                      {score}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+        ) : (
           <div style={{
             padding: "32px",
             border: "1px solid rgba(0,255,136,0.08)",
@@ -87,7 +141,7 @@ export default async function DashboardPage() {
           }}>
             Aun no tienes sesiones. Comienza tu primera entrevista.
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
