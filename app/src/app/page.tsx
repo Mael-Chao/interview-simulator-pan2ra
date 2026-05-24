@@ -130,7 +130,7 @@ export default function LandingPage() {
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#28c840", display: "block" }} />
             </div>
             <span style={{ flex: 1, textAlign: "center", fontSize: "11px", color: "rgba(200,212,200,0.4)", letterSpacing: "0.05em" }}>
-              interview-simulator &#8212; bash
+              "interview-simulator &#8212; bash"
             </span>
             <div style={{ width: 52 }} />
           </div>
@@ -138,7 +138,7 @@ export default function LandingPage() {
           {/* Terminal body */}
           <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "4px", minHeight: "340px" }}>
             <TerminalLine delay={200} onDone={() => setStep(1)}>
-              simulate --region=LATAM --lang=es
+              "simulate --region=LATAM --lang=es"
             </TerminalLine>
 
             {step >= 1 && (
@@ -152,7 +152,7 @@ export default function LandingPage() {
 
             {step >= 1 && (
               <TerminalLine delay={800} onDone={() => setStep(2)}>
-                load --job-posting="jobs.vercel.com/senior-engineer"
+                "load --job-posting="jobs.vercel.com/senior-engineer"
               </TerminalLine>
             )}
 
