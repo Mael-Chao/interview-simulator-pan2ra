@@ -67,5 +67,6 @@ export async function POST(request: Request) {
     score: report.score,
   });
 
+    console.log("Session saved:", sessionData.id);
   return NextResponse.json({ success: true, session_id: sessionData.id });
 }

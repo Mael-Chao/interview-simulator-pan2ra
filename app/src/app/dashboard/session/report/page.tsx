@@ -9,44 +9,51 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-useEffect(() => {
-  const messages = sessionStorage.getItem("session_messages");
-  const jobData = sessionStorage.getItem("job_parsed");
+  useEffect(() => {
+    const messages = sessionStorage.getItem("session_messages");
+    const jobData = sessionStorage.getItem("job_parsed");
 
-  if (!messages || !jobData) {
-    router.push("/dashboard");
-    return;
-  }
+    if (!messages || !jobData) {
+      router.push("/dashboard");
+      return;
+    }
 
-  const parsedJob = JSON.parse(jobData);
-  const parsedMessages = JSON.parse(messages);
-  setJob(parsedJob);
+    const parsedJob = JSON.parse(jobData);
+    const parsedMessages = JSON.parse(messages);
+    setJob(parsedJob);
 
-  fetch("/api/interview/report", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      messages: parsedMessages,
-      job: parsedJob,
-    }),
-  })
-    .then(r => r.json())
-    .then(data => {
-      setReport(data.data);
-      setLoading(false);
+    fetch("/api/interview/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: parsedMessages,
+        job: parsedJob,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        setReport(data.data);
+        setLoading(false);
 
-      // Guardar en Supabase
-      fetch("/api/interview/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          job: parsedJob,
-          messages: parsedMessages,
-          report: data.data,
-        }),
+        // Guardar en Supabase
+        fetch("/api/interview/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            job: parsedJob,
+            messages: parsedMessages,
+            report: data.data,
+          }),
+        })
+        .then(r => r.json())
+        .then(saveData => {
+          console.log("Save response:", saveData);
+        })
+        .catch(err => {
+          console.error("Save error:", err);
+        });
       });
-    });
-}, [router]);
+  }, [router]);
 
   if (loading) return (
     <div style={{
@@ -58,9 +65,10 @@ useEffect(() => {
       fontFamily: "monospace",
       color: "#00ff88",
       fontSize: "13px",
+      gap: "8px",
     }}>
       <span>Generando reporte</span>
-      <span style={{ animation: "blink 1s step-end infinite" }}>▋</span>
+      <span style={{ animation: "blink 1s step-end infinite" }}>&#9607;</span>
       <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
     </div>
   );
@@ -165,7 +173,7 @@ useEffect(() => {
                 fontSize: "13px",
                 lineHeight: 1.5,
               }}>
-                <span style={{ color: "#00ff88", flexShrink: 0 }}>✓</span>
+                <span style={{ color: "#00ff88", flexShrink: 0 }}>&#10003;</span>
                 <span>{s}</span>
               </div>
             ))}
@@ -189,7 +197,7 @@ useEffect(() => {
                 fontSize: "13px",
                 lineHeight: 1.5,
               }}>
-                <span style={{ color: "#ffcc00", flexShrink: 0 }}>→</span>
+                <span style={{ color: "#ffcc00", flexShrink: 0 }}>&#8594;</span>
                 <span>{w}</span>
               </div>
             ))}
@@ -254,7 +262,7 @@ useEffect(() => {
             cursor: "pointer",
           }}
         >
-          Nueva entrevista →
+          Nueva entrevista &#8594;
         </button>
 
       </main>
