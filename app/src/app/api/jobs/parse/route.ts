@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
 
-const GEMINI_API_KEY = "AIzaSyD6aEfDxvgouRqZ3l1zfpJwjaOamjQI1gc" //process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`;
-
 export async function POST(request: Request) {
   const { text } = await request.json();
 
@@ -10,50 +7,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Texto muy corto" }, { status: 400 });
   }
 
-  const prompt = `Eres un analizador experto de ofertas de trabajo tech.
-Analiza esta oferta y responde SOLO con un objeto JSON, sin texto adicional, sin markdown, sin backticks.
+  // Mock response — swap for real AI when available
+  const parsed = {
+    company_name: "Vercel",
+    role: "Senior Frontend Engineer",
+    level: "senior",
+    stack: ["Next.js", "TypeScript", "React", "Edge Runtime"],
+    responsibilities: [
+      "Construir features del core de Next.js",
+      "Colaborar con el equipo de producto",
+      "Optimizar performance en producción"
+    ],
+    requirements: [
+      "5+ años de experiencia",
+      "Experto en React y TypeScript",
+      "Experiencia con Edge Runtime"
+    ],
+    culture: "Remote-first, alto impacto, equipo pequeño",
+    remote_friendly: true,
+    latam_friendly: true,
+    summary: "Rol senior en el core team de Next.js, enfocado en performance y developer experience."
+  };
 
-Oferta:
-${text}
-
-Responde exactamente con esta estructura:
-{
-  "company_name": "nombre de la empresa",
-  "role": "titulo del puesto",
-  "level": "junior|mid|senior",
-  "stack": ["tecnologia1", "tecnologia2"],
-  "responsibilities": ["responsabilidad1", "responsabilidad2"],
-  "requirements": ["requisito1", "requisito2"],
-  "culture": "descripcion breve de la cultura de la empresa",
-  "remote_friendly": true,
-  "latam_friendly": true,
-  "summary": "resumen de 2 lineas de la oferta"
-}`;
-
-  const response = await fetch(GEMINI_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-    }),
-  });
-
-  const data = await response.json();
-  console.log("Gemini status:", response.status);
-  console.log("Gemini response:", JSON.stringify(data, null, 2));
-
-  
-  let result = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
-  if (result.startsWith("```")) {
-    result = result.split("```")[1];
-    if (result.startsWith("json")) result = result.slice(4);
-  }
-
-  try {
-    const parsed = JSON.parse(result.trim());
-    return NextResponse.json({ success: true, data: parsed });
-  } catch {
-    return NextResponse.json({ error: "Error parseando respuesta", raw: data }, { status: 500 });
-  }
+  return NextResponse.json({ success: true, data: parsed });
 }
