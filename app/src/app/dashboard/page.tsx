@@ -38,7 +38,7 @@ export default async function DashboardPage() {
         justifyContent: "space-between",
       }}>
         <span style={{ color: "#00ff88", fontSize: "13px", fontWeight: 600 }}>
-          interview-simulator
+          interview-simulator-Pan2ra
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "12px", color: "rgba(200,212,200,0.4)" }}>

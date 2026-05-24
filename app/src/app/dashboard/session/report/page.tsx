@@ -92,7 +92,7 @@ export default function ReportPage() {
         justifyContent: "space-between",
       }}>
         <span style={{ color: "#00ff88", fontSize: "13px", fontWeight: 600 }}>
-          interview-simulator
+          interview-simulator-Pan2ra
         </span>
         <button
           onClick={() => router.push("/dashboard")}

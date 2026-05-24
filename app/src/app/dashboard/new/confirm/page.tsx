@@ -33,7 +33,7 @@ export default function ConfirmPage() {
         justifyContent: "space-between",
       }}>
         <span style={{ color: "#00ff88", fontSize: "13px", fontWeight: 600 }}>
-          interview-simulator
+          interview-simulator-Pan2ra
         </span>
         <a href="/dashboard/new" style={{
           fontSize: "11px",

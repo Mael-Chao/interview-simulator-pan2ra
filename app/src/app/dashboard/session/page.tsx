@@ -94,7 +94,7 @@ export default function SessionPage() {
         flexShrink: 0,
       }}>
         <span style={{ color: "#00ff88", fontSize: "13px", fontWeight: 600 }}>
-          interview-simulator
+          interview-simulator-Pan2ra
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <span style={{ fontSize: "11px", color: "rgba(200,212,200,0.4)" }}>
