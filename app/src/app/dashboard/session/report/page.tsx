@@ -9,32 +9,44 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const messages = sessionStorage.getItem("session_messages");
-    const jobData = sessionStorage.getItem("job_parsed");
+useEffect(() => {
+  const messages = sessionStorage.getItem("session_messages");
+  const jobData = sessionStorage.getItem("job_parsed");
 
-    if (!messages || !jobData) {
-      router.push("/dashboard");
-      return;
-    }
+  if (!messages || !jobData) {
+    router.push("/dashboard");
+    return;
+  }
 
-    const parsedJob = JSON.parse(jobData);
-    setJob(parsedJob);
+  const parsedJob = JSON.parse(jobData);
+  const parsedMessages = JSON.parse(messages);
+  setJob(parsedJob);
 
-    fetch("/api/interview/report", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: JSON.parse(messages),
-        job: parsedJob,
-      }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        setReport(data.data);
-        setLoading(false);
+  fetch("/api/interview/report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: parsedMessages,
+      job: parsedJob,
+    }),
+  })
+    .then(r => r.json())
+    .then(data => {
+      setReport(data.data);
+      setLoading(false);
+
+      // Guardar en Supabase
+      fetch("/api/interview/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job: parsedJob,
+          messages: parsedMessages,
+          report: data.data,
+        }),
       });
-  }, [router]);
+    });
+}, [router]);
 
   if (loading) return (
     <div style={{
