@@ -25,7 +25,8 @@ function TypingText({ text, speed = 30, onDone }: { text: string; speed?: number
       }
     }, speed);
     return () => clearInterval(interval);
-  }, [text]);
+  //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [text]);
 
   return (
     <span>
@@ -129,7 +130,7 @@ export default function LandingPage() {
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#28c840", display: "block" }} />
             </div>
             <span style={{ flex: 1, textAlign: "center", fontSize: "11px", color: "rgba(200,212,200,0.4)", letterSpacing: "0.05em" }}>
-              interview-simulator — bash
+              interview-simulator &#8212; bash
             </span>
             <div style={{ width: 52 }} />
           </div>
