@@ -9,6 +9,6 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     await supabase.auth.exchangeCodeForSession(code);
   }
-
+ //stalemate
   return NextResponse.redirect(`https://interview-simulator-pan2ra.vercel.app/dashboard`);
 }
