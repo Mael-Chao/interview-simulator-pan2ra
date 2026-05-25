@@ -10,5 +10,5 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  return NextResponse.redirect(`https://interview-simulator-pan2ra/dashboard`);
+  return NextResponse.redirect(`https://interview-simulator-pan2ra.vercel.app/dashboard`);
 }
