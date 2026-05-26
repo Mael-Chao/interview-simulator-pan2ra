@@ -58,7 +58,14 @@ export default async function DashboardPage() {
       </nav>
 
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 24px" }}>
-        <div style={{ marginBottom: "40px", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div style={{ 
+            marginBottom: "40px", 
+            display: "flex", 
+            alignItems: "flex-start", 
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "16px",
+          }}>
           <div>
             <div style={{ fontSize: "11px", color: "#00ff88", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
               $ dashboard --user

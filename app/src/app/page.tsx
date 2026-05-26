@@ -102,8 +102,8 @@ export default function LandingPage() {
         width: "100%",
         maxWidth: "1100px",
         display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "60px",
+        gridTemplateColumns: "var(--grid-cols, 1fr 1fr)",
+        gap: "var(--grid-gap, 60px)",
         alignItems: "center",
       }}>
 
@@ -321,6 +321,12 @@ export default function LandingPage() {
           display: inline-block;
           animation: blink 1s step-end infinite;
           color: #00ff88;
+        }
+        @media (max-width: 768px) {
+          :root {
+            --grid-cols: 1fr;
+            --grid-gap: 32px;
+          }
         }
       `}</style>
     </div>
