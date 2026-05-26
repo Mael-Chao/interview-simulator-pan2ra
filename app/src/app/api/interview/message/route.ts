@@ -47,12 +47,13 @@ Reglas:
     });
 
     const data = await res.json();
+    console.log("CF response:", JSON.stringify(data));
     const message = data.result?.response ?? "";
+    
 
     if (!message) {
       return NextResponse.json({ message: "Un momento, continuamos en breve..." });
     }
-
     return NextResponse.json({ message });
   } catch {
     return NextResponse.json({ message: "Error de conexion. Intenta de nuevo." });
