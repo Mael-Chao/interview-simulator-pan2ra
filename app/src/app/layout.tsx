@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Pan2ra",
+  title: "Interview-Simulator-Pan2ra",
   description: "Simulador de entrevistas técnicas para developers en LATAM",
 };
 
