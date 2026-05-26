@@ -48,8 +48,13 @@ Reglas:
     });
 
     const data = await res.json();
-    console.log("STATUS:", res.status);
-    console.log("DATA:", JSON.stringify(data));
+    // Debug temporal — devolver todo
+    return NextResponse.json({ 
+      debug: true,
+      status: res.status,
+      data: data,
+      message: data.result?.response ?? "sin respuesta"
+    });
     const message = data.result?.response ?? "";
     
 
