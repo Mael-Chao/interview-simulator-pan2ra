@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-const CF_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const CF_ACCOUNT = process.env.CLOUDFLARE_ACCOUNT_ID;
+const CF_TOKEN = "cfut_9XrCUzXMgW2a6xfBzCfnHGIFEP8ZBpklwagu68qd4c76ee21";
+const CF_ACCOUNT = "492641f1f7ca32bd05d21dd83e05595b";
 const CF_URL = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/ai/run/@cf/meta/llama-3.1-8b-instruct`;
 
 export async function POST(request: Request) {
@@ -47,7 +47,8 @@ Reglas:
     });
 
     const data = await res.json();
-    console.log("CF response:", JSON.stringify(data));
+    console.log("STATUS:", res.status);
+    console.log("DATA:", JSON.stringify(data));
     const message = data.result?.response ?? "";
     
 
