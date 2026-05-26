@@ -226,8 +226,7 @@ Habilita RLS y configura GitHub OAuth en **Authentication → Providers**.
 
 **Ismael Pérez** — Full Stack Developer
 
-[GitHub](https://github.com/Mael-Chao) · [LinkedIn](https://linkedin.com/in/tu-perfil)
-
+[GitHub](https://github.com/Mael-Chao)
 ---
 
 <div align="center">
