@@ -37,6 +37,7 @@ Reglas:
       ];
 
   try {
+    console.log("Reaching CF fetch...");
     const res = await fetch(CF_URL, {
       method: "POST",
       headers: {
