@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     .map((m: any) => `${m.role === "interviewer" ? "Entrevistador" : "Candidato"}: ${m.content}`)
     .join("\n");
 
-  const prompt = `Eres un evaluador experto de entrevistas tecnicas. Analiza esta entrevista y responde SOLO con un objeto JSON, sin texto adicional, sin markdown, sin backticks.
+  const prompt = `Analiza esta entrevista tecnica y responde SOLO con un objeto JSON valido, sin texto adicional, sin markdown, sin backticks.
 
 Puesto: ${job.role} en ${job.company_name}
 Stack: ${job.stack?.join(", ")}
@@ -19,13 +19,13 @@ Stack: ${job.stack?.join(", ")}
 Conversacion:
 ${conversation}
 
-Responde exactamente con esta estructura:
+Responde exactamente con esta estructura JSON:
 {
   "score": 75,
   "strengths": ["fortaleza 1", "fortaleza 2", "fortaleza 3"],
   "weaknesses": ["area de mejora 1", "area de mejora 2", "area de mejora 3"],
-  "patterns": "descripcion de patrones detectados en las respuestas",
-  "study_plan": "1. Esta semana: ...\n2. Proxima semana: ...\n3. Semana 3: ...\n4. Semana 4: ..."
+  "patterns": "descripcion de patrones detectados en las respuestas del candidato",
+  "study_plan": "1. Esta semana: accion concreta\n2. Proxima semana: accion concreta\n3. Semana 3: accion concreta\n4. Semana 4: accion concreta"
 }`;
 
   try {
@@ -37,7 +37,7 @@ Responde exactamente con esta estructura:
       },
       body: JSON.stringify({
         messages: [
-          { role: "system", content: "Eres un evaluador experto. Responde SOLO con JSON valido, sin texto adicional." },
+          { role: "system", content: "Eres un evaluador experto de entrevistas tecnicas. Responde SOLO con JSON valido, sin texto adicional ni backticks." },
           { role: "user", content: prompt }
         ],
       }),
@@ -53,8 +53,8 @@ Responde exactamente con esta estructura:
 
     const parsed = JSON.parse(result.trim());
     return NextResponse.json({ success: true, data: parsed });
+
   } catch {
-    // Fallback al mock si falla el parse
     return NextResponse.json({
       success: true,
       data: {
