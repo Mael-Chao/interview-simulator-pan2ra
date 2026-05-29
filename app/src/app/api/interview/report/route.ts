@@ -46,12 +46,18 @@ Responde exactamente con esta estructura JSON:
     const data = await res.json();
     let result = data.result?.response ?? "";
 
-    if (result.startsWith("```")) {
-      result = result.split("```")[1];
+    // Limpiar backticks
+    if (result.includes("```")) {
+      const parts = result.split("```");
+      result = parts[1] || parts[0];
       if (result.startsWith("json")) result = result.slice(4);
     }
 
-    const parsed = JSON.parse(result.trim());
+    // Extraer solo el objeto JSON si hay texto antes o después
+    const jsonMatch = result.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON found");
+    
+    const parsed = JSON.parse(jsonMatch[0]);
     return NextResponse.json({ success: true, data: parsed });
 
   } catch {
