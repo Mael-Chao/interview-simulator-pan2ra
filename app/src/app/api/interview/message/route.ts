@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const CF_TOKEN = "cfut_9XrCUzXMgW2a6xfBzCfnHGIFEP8ZBpklwagu68qd4c76ee21";
+const CF_TOKEN = "cfut_VvOcA7cKsB532QaLq6lVCT8Qrt2ETbSQJcAHj1G0b9848c36";
 const CF_ACCOUNT = "492641f1f7ca32bd05d21dd83e05595b";
 const CF_URL = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/ai/run/@cf/meta/llama-3.1-8b-instruct`;
 
