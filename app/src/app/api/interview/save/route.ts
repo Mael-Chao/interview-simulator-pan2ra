@@ -1,8 +1,29 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
+  const cookieStore = await cookies();
+  
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {}
+        },
+      },
+    }
+  );
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -11,7 +32,6 @@ export async function POST(request: Request) {
 
   const { job, messages, report } = await request.json();
 
-  // Guardar job posting
   const { data: jobData, error: jobError } = await supabase
     .from("job_postings")
     .insert({
@@ -29,7 +49,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: jobError.message }, { status: 500 });
   }
 
-  // Guardar sesión
   const { data: sessionData, error: sessionError } = await supabase
     .from("sessions")
     .insert({
@@ -47,7 +66,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: sessionError.message }, { status: 500 });
   }
 
-  // Guardar mensajes
   const messagesData = messages.map((m: any) => ({
     session_id: sessionData.id,
     role: m.role,
@@ -56,7 +74,6 @@ export async function POST(request: Request) {
 
   await supabase.from("messages").insert(messagesData);
 
-  // Guardar reporte
   await supabase.from("reports").insert({
     session_id: sessionData.id,
     user_id: user.id,
@@ -67,6 +84,5 @@ export async function POST(request: Request) {
     score: report.score,
   });
 
-    console.log("Session saved:", sessionData.id);
   return NextResponse.json({ success: true, session_id: sessionData.id });
 }
