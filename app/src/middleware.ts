@@ -25,18 +25,14 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Esto refresca el token automáticamente si está por expirar
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Si no hay usuario y está en ruta protegida, redirigir al login
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
-  if (!user && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
-  }
+  // Solo refrescar el token, sin redirigir
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|auth).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api|auth).*)",
+  ],
 };
