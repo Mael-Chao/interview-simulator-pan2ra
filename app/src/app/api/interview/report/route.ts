@@ -11,23 +11,6 @@ export async function POST(request: Request) {
     .map((m: any) => `${m.role === "interviewer" ? "Entrevistador" : "Candidato"}: ${m.content}`)
     .join("\n");
 
-  const prompt = `Analiza esta entrevista tecnica y responde SOLO con un objeto JSON valido, sin texto adicional, sin markdown, sin backticks.
-
-Puesto: ${job.role} en ${job.company_name}
-Stack: ${job.stack?.join(", ")}
-
-Conversacion:
-${conversation}
-
-Responde exactamente con esta estructura JSON:
-{
-  "score": 75,
-  "strengths": ["fortaleza 1", "fortaleza 2", "fortaleza 3"],
-  "weaknesses": ["area de mejora 1", "area de mejora 2", "area de mejora 3"],
-  "patterns": "descripcion de patrones detectados",
-  "study_plan": "1. Esta semana: accion\n2. Proxima semana: accion\n3. Semana 3: accion\n4. Semana 4: accion"
-}`;
-
   try {
     const res = await fetch(CF_URL, {
       method: "POST",
@@ -36,18 +19,31 @@ Responde exactamente con esta estructura JSON:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        max_tokens: 2048,
         messages: [
-          { role: "system", content: "Eres un evaluador experto de entrevistas tecnicas. Responde SOLO con JSON valido, sin texto adicional ni backticks." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content: "Eres un evaluador experto de entrevistas tecnicas. Responde SOLO con JSON valido, sin texto adicional ni backticks.",
+          },
+          {
+            role: "user",
+            content: `Analiza esta entrevista tecnica y responde SOLO con JSON valido.
+
+Puesto: ${job.role} en ${job.company_name}
+Stack: ${job.stack?.join(", ")}
+
+Conversacion:
+${conversation}
+
+JSON requerido (responde SOLO esto, sin texto extra):
+{"score":75,"strengths":["s1","s2","s3"],"weaknesses":["w1","w2","w3"],"patterns":"texto breve","study_plan":"semana1|semana2|semana3|semana4"}`,
+          },
         ],
       }),
     });
 
     const data = await res.json();
     let result = data.result?.response ?? "";
-
-     // Debug temporal
-    return NextResponse.json({ success: true, data: { raw: result, status: res.status } });
 
     if (result.includes("```")) {
       const parts = result.split("```");
@@ -59,6 +55,15 @@ Responde exactamente con esta estructura JSON:
     if (!jsonMatch) throw new Error("No JSON found");
 
     const parsed = JSON.parse(jsonMatch[0]);
+
+    // Convertir study_plan de pipe a saltos de linea si viene en formato pipe
+    if (parsed.study_plan && parsed.study_plan.includes("|")) {
+      parsed.study_plan = parsed.study_plan
+        .split("|")
+        .map((s: string, i: number) => `${i + 1}. ${s.trim()}`)
+        .join("\n");
+    }
+
     return NextResponse.json({ success: true, data: parsed });
 
   } catch {
