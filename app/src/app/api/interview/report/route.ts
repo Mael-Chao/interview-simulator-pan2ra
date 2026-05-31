@@ -46,6 +46,9 @@ Responde exactamente con esta estructura JSON:
     const data = await res.json();
     let result = data.result?.response ?? "";
 
+     // Debug temporal
+    return NextResponse.json({ success: true, data: { raw: result, status: res.status } });
+
     if (result.includes("```")) {
       const parts = result.split("```");
       result = parts[1] || parts[0];
