@@ -44,6 +44,8 @@ Responde exactamente con esta estructura JSON:
     });
 
     const data = await res.json();
+    console.log("REPORT CF STATUS:", res.status);
+    console.log("REPORT CF DATA:", JSON.stringify(data));
     let result = data.result?.response ?? "";
 
     // Limpiar backticks
