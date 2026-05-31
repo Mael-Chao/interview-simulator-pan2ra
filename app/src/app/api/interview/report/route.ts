@@ -44,9 +44,14 @@ Responde exactamente con esta estructura JSON:
     });
 
     const data = await res.json();
-    console.log("REPORT CF STATUS:", res.status);
-    console.log("REPORT CF DATA:", JSON.stringify(data));
     let result = data.result?.response ?? "";
+    
+    // Debug temporal
+    return NextResponse.json({ 
+      debug: true,
+      status: res.status,
+      raw: result
+    });
 
     // Limpiar backticks
     if (result.includes("```")) {
