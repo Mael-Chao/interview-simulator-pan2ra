@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ReportPage() {
   const [report, setReport] = useState<any>(null);
@@ -22,7 +23,7 @@ export default function ReportPage() {
     const parsedMessages = JSON.parse(messages);
     setJob(parsedJob);
 
-    fetch("/api/interview/report", {
+    fetch("/api/interview/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -36,22 +37,28 @@ export default function ReportPage() {
         setLoading(false);
 
         // Guardar en Supabase
-        fetch("/api/interview/save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            job: parsedJob,
-            messages: parsedMessages,
-            report: data.data,
-          }),
-        })
-        .then(r => r.json())
-        .then(saveData => {
-          console.log("Save response:", saveData);
-        })
-        .catch(err => {
-          console.error("Save error:", err);
-        });
+        const saveSession = async () => {
+          const supabase = createClient();
+          await supabase.auth.refreshSession();
+          
+          fetch("/api/interview/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              job: parsedJob,
+              messages: parsedMessages,
+              report: data.data,
+            }),
+          })
+          .then(r => r.json())
+          .then(saveData => {
+            console.log("Save response:", saveData);
+          })
+          .catch(err => {
+            console.error("Save error:", err);
+          });
+        };
+        saveSession();
       });
   }, [router]);
 
