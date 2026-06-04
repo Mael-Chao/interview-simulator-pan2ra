@@ -23,43 +23,41 @@ export default function ReportPage() {
     const parsedMessages = JSON.parse(messages);
     setJob(parsedJob);
 
-    fetch("/api/interview/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: parsedMessages,
-        job: parsedJob,
-      }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        setReport(data.data);
-        setLoading(false);
+    const run = async () => {
+      // 1. Refrescar sesion
+      const supabase = createClient();
+      await supabase.auth.refreshSession();
 
-        // Guardar en Supabase
-        const saveSession = async () => {
-          const supabase = createClient();
-          await supabase.auth.refreshSession();
-          
-          fetch("/api/interview/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              job: parsedJob,
-              messages: parsedMessages,
-              report: data.data,
-            }),
-          })
-          .then(r => r.json())
-          .then(saveData => {
-            console.log("Save response:", saveData);
-          })
-          .catch(err => {
-            console.error("Save error:", err);
-          });
-        };
-        saveSession();
+      // 2. Generar reporte con IA
+      const reportRes = await fetch("/api/interview/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: parsedMessages,
+          job: parsedJob,
+        }),
       });
+
+      const reportData = await reportRes.json();
+      setReport(reportData.data);
+      setLoading(false);
+
+      // 3. Guardar en Supabase
+      const saveRes = await fetch("/api/interview/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job: parsedJob,
+          messages: parsedMessages,
+          report: reportData.data,
+        }),
+      });
+
+      const saveData = await saveRes.json();
+      console.log("Save response:", saveData);
+    };
+
+    run().catch(console.error);
   }, [router]);
 
   if (loading) return (
@@ -99,7 +97,7 @@ export default function ReportPage() {
         justifyContent: "space-between",
       }}>
         <span style={{ color: "#00ff88", fontSize: "13px", fontWeight: 600 }}>
-          interview-simulator-Pan2ra
+          Pan2ra
         </span>
         <button
           onClick={() => router.push("/dashboard")}
@@ -120,7 +118,6 @@ export default function ReportPage() {
 
       <main style={{ maxWidth: "700px", margin: "0 auto", padding: "48px 24px" }}>
 
-        {/* Header */}
         <div style={{ marginBottom: "40px" }}>
           <div style={{ fontSize: "11px", color: "#00ff88", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "8px" }}>
             $ generate --report
@@ -133,7 +130,6 @@ export default function ReportPage() {
           </p>
         </div>
 
-        {/* Score */}
         <div style={{
           padding: "24px",
           border: `1px solid ${scoreColor}33`,
@@ -163,7 +159,6 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Strengths */}
         <div style={{ marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", color: "#00ff88", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
             Fortalezas
@@ -187,7 +182,6 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Weaknesses */}
         <div style={{ marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", color: "#ffcc00", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
             Areas de mejora
@@ -211,7 +205,6 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Patterns */}
         <div style={{ marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", color: "rgba(200,212,200,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
             Patrones detectados
@@ -229,7 +222,6 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Study plan */}
         <div style={{ marginBottom: "40px" }}>
           <div style={{ fontSize: "11px", color: "rgba(200,212,200,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
             Plan de estudio
@@ -248,7 +240,6 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* CTA */}
         <button
           onClick={() => {
             sessionStorage.removeItem("session_messages");
