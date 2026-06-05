@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 interface Message {
   role: "interviewer" | "candidate";
@@ -101,9 +102,12 @@ export default function SessionPage() {
             {job.company_name} · {job.role}
           </span>
         <button
-        onClick={() => {
-            sessionStorage.setItem("session_messages", JSON.stringify(messages));
-            router.push("/dashboard/session/report");
+        onClick={async () => {
+          const supabase = createClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          sessionStorage.setItem("session_messages", JSON.stringify(messages));
+          sessionStorage.setItem("user_id", session?.user?.id ?? "");
+          router.push("/dashboard/session/report");
         }}
         style={{
             fontSize: "11px",

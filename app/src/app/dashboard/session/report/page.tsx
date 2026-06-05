@@ -24,46 +24,42 @@ export default function ReportPage() {
     setJob(parsedJob);
 
     const run = async () => {
-      // 1. Refrescar sesion y obtener user
-      const supabase = createClient();
-      await supabase.auth.refreshSession();
-      const { data: { user } } = await supabase.auth.getUser();
+  const userId = sessionStorage.getItem("user_id");
 
-      if (!user) {
-        router.push("/auth/login");
-        return;
-      }
+  if (!userId) {
+    router.push("/auth/login");
+    return;
+  }
 
-      // 2. Generar reporte con IA
-      const reportRes = await fetch("/api/interview/report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: parsedMessages,
-          job: parsedJob,
-        }),
-      });
+  // Generar reporte con IA
+  const reportRes = await fetch("/api/interview/report", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: parsedMessages,
+      job: parsedJob,
+    }),
+  });
 
-      const reportData = await reportRes.json();
-      setReport(reportData.data);
-      setLoading(false);
+  const reportData = await reportRes.json();
+  setReport(reportData.data);
+  setLoading(false);
 
-      // 3. Guardar en Supabase con user_id
-      const saveRes = await fetch("/api/interview/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          job: parsedJob,
-          messages: parsedMessages,
-          report: reportData.data,
-          user_id: user.id,
-        }),
-      });
+  // Guardar en Supabase
+  const saveRes = await fetch("/api/interview/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      job: parsedJob,
+      messages: parsedMessages,
+      report: reportData.data,
+      user_id: userId,
+    }),
+  });
 
-      const saveData = await saveRes.json();
-      console.log("Save response:", saveData);
-    };
-
+  const saveData = await saveRes.json();
+  console.log("Save response:", saveData);
+};
     run().catch(console.error);
   }, [router]);
 
