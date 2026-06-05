@@ -1,41 +1,22 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    }
-  );
+  const { job, messages, report, user_id } = await request.json();
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!user_id) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const { job, messages, report } = await request.json();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   const { data: jobData, error: jobError } = await supabase
     .from("job_postings")
     .insert({
-      user_id: user.id,
+      user_id,
       company_name: job.company_name,
       role: job.role,
       stack: job.stack,
@@ -52,7 +33,7 @@ export async function POST(request: Request) {
   const { data: sessionData, error: sessionError } = await supabase
     .from("sessions")
     .insert({
-      user_id: user.id,
+      user_id,
       job_posting_id: jobData.id,
       role: job.role,
       level: job.level,
@@ -76,7 +57,7 @@ export async function POST(request: Request) {
 
   await supabase.from("reports").insert({
     session_id: sessionData.id,
-    user_id: user.id,
+    user_id,
     strengths: report.strengths,
     weaknesses: report.weaknesses,
     patterns: report.patterns,

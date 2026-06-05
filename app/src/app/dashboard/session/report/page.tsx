@@ -24,10 +24,15 @@ export default function ReportPage() {
     setJob(parsedJob);
 
     const run = async () => {
-      // 1. Refrescar sesion
+      // 1. Refrescar sesion y obtener user
       const supabase = createClient();
       await supabase.auth.refreshSession();
-      console.log("Session refreshed");
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/auth/login");
+        return;
+      }
 
       // 2. Generar reporte con IA
       const reportRes = await fetch("/api/interview/report", {
@@ -40,12 +45,10 @@ export default function ReportPage() {
       });
 
       const reportData = await reportRes.json();
-      console.log("Report generated:", reportData.success);
       setReport(reportData.data);
       setLoading(false);
 
-      // 3. Guardar en Supabase
-      console.log("About to save...");
+      // 3. Guardar en Supabase con user_id
       const saveRes = await fetch("/api/interview/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +56,7 @@ export default function ReportPage() {
           job: parsedJob,
           messages: parsedMessages,
           report: reportData.data,
+          user_id: user.id,
         }),
       });
 
