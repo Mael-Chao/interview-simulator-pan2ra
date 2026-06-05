@@ -27,6 +27,7 @@ export default function ReportPage() {
       // 1. Refrescar sesion
       const supabase = createClient();
       await supabase.auth.refreshSession();
+      console.log("Session refreshed");
 
       // 2. Generar reporte con IA
       const reportRes = await fetch("/api/interview/report", {
@@ -39,10 +40,12 @@ export default function ReportPage() {
       });
 
       const reportData = await reportRes.json();
+      console.log("Report generated:", reportData.success);
       setReport(reportData.data);
       setLoading(false);
 
       // 3. Guardar en Supabase
+      console.log("About to save...");
       const saveRes = await fetch("/api/interview/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
