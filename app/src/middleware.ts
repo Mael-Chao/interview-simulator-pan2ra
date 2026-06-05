@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Solo refrescar el token, sin redirigir
+  // Solo refrescar token, nunca redirigir
   await supabase.auth.getUser();
 
   return supabaseResponse;
@@ -33,6 +33,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api|auth).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api).*)",
   ],
 };
