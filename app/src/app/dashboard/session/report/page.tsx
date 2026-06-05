@@ -23,15 +23,10 @@ export default function ReportPage() {
     const parsedMessages = JSON.parse(messages);
     setJob(parsedJob);
 
-    const run = async () => {
+const run = async () => {
   const userId = sessionStorage.getItem("user_id");
 
-  if (!userId) {
-    router.push("/auth/login");
-    return;
-  }
-
-  // Generar reporte con IA
+  // Generar reporte con IA siempre
   const reportRes = await fetch("/api/interview/report", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -45,20 +40,21 @@ export default function ReportPage() {
   setReport(reportData.data);
   setLoading(false);
 
-  // Guardar en Supabase
-  const saveRes = await fetch("/api/interview/save", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      job: parsedJob,
-      messages: parsedMessages,
-      report: reportData.data,
-      user_id: userId,
-    }),
-  });
-
-  const saveData = await saveRes.json();
-  console.log("Save response:", saveData);
+  // Guardar solo si hay userId
+  if (userId) {
+    const saveRes = await fetch("/api/interview/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        job: parsedJob,
+        messages: parsedMessages,
+        report: reportData.data,
+        user_id: userId,
+      }),
+    });
+    const saveData = await saveRes.json();
+    console.log("Save response:", saveData);
+  }
 };
     run().catch(console.error);
   }, [router]);
